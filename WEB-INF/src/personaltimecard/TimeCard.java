@@ -5,24 +5,34 @@ public class TimeCard {
 	private String year = null;
 	private String month = null;
 	private String day = null;
-	private String hour = null;
-	private String minute = null;
-	private String date_uuid = null;
-	private String clock_in_hour = null;
-	private String clock_in_minute = null;
-	private String clock_out_hour = null;
-	private String clock_out_minute = null;
+	private String dateUuid = null;
+	private String clockInHour = null;
+	private String clockInMinute = null;
+	private String clockOutHour = null;
+	private String clockOutMinute = null;
 
 	public TimeCard(String year, String month, String day){
-
+		this.uuid = java.util.UUID.randomUUID().toString();
+		this.year = year;
+		this.month = month;
+		this.day = day;
 	}
 
 	public TimeCard(String uuid, String dateUuid, String clockInHour, String clockInMinute, String clockOutHour, String clockOutMinute){
-
+		this.uuid = uuid;
+		this.dateUuid = dateUuid;
+		this.clockInHour = clockInHour;
+		this.clockInMinute = clockInMinute;
+		this.clockOutHour = clockOutHour;
+		this.clockOutMinute = clockOutMinute;
 	}
 
-	public TimeCard(String day, String clock_in_hour, String clock_in_minute, String clock_out_hour, String clock_out_minute){
-
+	public TimeCard(String day, String clockInHour, String clockInMinute, String clockOutHour, String clockOutMinute){
+		this.day = day;
+		this.clockInHour = clockInHour;
+		this.clockInMinute = clockInMinute;
+		this.clockOutHour = clockOutHour;
+		this.clockOutMinute = clockOutMinute;
 	}
 
 	public String getUuid(){
@@ -40,31 +50,23 @@ public class TimeCard {
 		return day;
 	}
 
-	public String getHour(){
-		return hour;
+	public String getDateUuid(){
+		return dateUuid;
 	}
 
-	public String getMinute(){
-		return minute;
+	public String getClockInHour(){
+		return clockInHour;
 	}
 
-	public String getDate_Uuid(){
-		return date_uuid;
+	public String getClockInMinute(){
+		return clockInMinute;
 	}
 
-	public String getClock_In_Hour(){
-		return clock_in_hour;
+	public String getClockOuthour(){
+		return clockOutHour;
 	}
 
-	public String getClock_In_Minute(){
-		return clock_in_minute;
-	}
-
-	public String getClock_Out_hour(){
-		return clock_out_hour;
-	}
-
-	public String getClock_Out_Minute(){
-		return clock_out_minute;
+	public String getClockOutMinute(){
+		return clockOutMinute;
 	}
 }

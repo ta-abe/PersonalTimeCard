@@ -8,6 +8,7 @@
   </head>
   <body>
     <form method = "POST" action = "personaltimecard">
+          <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
       <h2>出勤時刻
         <select name = "selectClockInHour">
         <option value = "00">00</option>
@@ -99,7 +100,7 @@
         <option value = "59">59</option>
       </select>
         分
-        <button type = "submit" name = "btnModifyClockIn" value = "">修正</button>
+        <button type = "submit" name = "btnModifyClockIn" value = "btnModifyClockIn">修正</button>
       </h2>
       <h2>退勤時刻
         <select name = "selectClockOutHour">
@@ -192,9 +193,9 @@
         <option value = "59">59</option>
         </select>
         分
-        <button type = "submit" name = "btnModifyClockOut" value = "">修正</button>
+        <button type = "submit" name = "btnModifyClockOut" value = "btnModifyClockOut">修正</button>
       </h2><BR>
-      <button type = "submit" name = "btnBack" value = "">戻る</button><BR><BR>
+      <button type = "submit" name = "btnBack" value = "btnBack002">戻る</button><BR><BR>
     </form>
     <table border = "1">
       <tr>

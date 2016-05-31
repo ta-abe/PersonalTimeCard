@@ -7,6 +7,7 @@
     <title>一覧表示</title>
   </head>
   <body>
+  <form method = "POST" action = "personaltimecard">
     <select name = "selectYear" required>
         <option value = "">--</option>
         <option value = "2010">2010</option>
@@ -36,7 +37,7 @@
         <option value = "1">1</option>
         <option value = "2">2</option>
         <option value = "3">3</option>
-        <option value = "4">5</option>
+        <option value = "4">4</option>
         <option value = "5">5</option>
         <option value = "6">6</option>
         <option value = "7">7</option>
@@ -46,8 +47,10 @@
         <option value = "11">11</option>
         <option value = "12">12</option>
       </select>月
-      <button type = "submit" name = "btnList" value = "">一覧表示</button><BR>
+      <button type = "submit" name = "btnList" value = "btnList">一覧表示</button><BR>
+      </form>
       <h2>出勤時刻一覧</h2>
+      <form method = "POST" action = "personaltimecard">
       <table border = "1">
         <tr>
           <th>日付</th>
@@ -55,15 +58,23 @@
           <th>退勤時間</th>
           <th></th>
         </tr>
-        <%for(int i = 0; i < 5; i++){%>
+        <%Object size = request.getAttribute("size");
+        int j = 0;
+        if(size != null){
+          String s ;
+          s = size.toString();
+          j = Integer.parseInt(s);
+        }
+        for(int i = 0; i < j; i++){%>
           <tr>
-            <th><label name = "lblDay"><%=i + 1%></label></th>
-            <th><label name = "lblClockIn">lblClockIn<%=i + 1%></label></th>
-            <th><label name = "lblClockOut">lblClockOut<%=i + 1 %></label></th>
-            <th><button type = "submit" value = "">修正</button></th>
+            <th><label name = "lblDay"><%=request.getAttribute("lblDay" + i)%></label></th>
+            <th><label name = "lblClockInHour"><%=request.getAttribute("lblClockInHour" + i)%>:<%=request.getAttribute("lblClockInMinute" + i)%></label></th>
+            <th><label name = "lblClockOut"><%=request.getAttribute("lblClockOutHour" + i)%>:<%=request.getAttribute("lblClockOutMinute" + i)%></label></th>
+            <th><button type = "submit" name  = "btnModify" value = "btnModify">修正</button></th>
           </tr>
         <%} %>
       </table>
-      <button type = "submit" name = "btnBack" value = "">戻る</button>
+      <button type = "submit" name = "btnBack" value = "btnBack001">戻る</button>
+      </form>
   </body>
 </html>

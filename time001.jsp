@@ -15,15 +15,22 @@
     <title>初期画面</title>
   </head>
   <body>
+  <%
+  Object hiduuid = request.getAttribute("hidUuid");
+  if(null == hiduuid){ %>
+    <form method = "GET" action = "personaltimecard">
+     <meta http-equiv = "refresh" content = "0;URL=http://localhost:8080/PersonalTimeCard/personaltimecard?year=<%=year%>&month=<%=month + 1%>&day=<%=day%>">
+    </form>
+  <%}else{%>
     <h1>
-      <%= year %>年<%= month%>月<%= day%>日<BR>
-      <%= hour %>時<%= minute%>分
+      <%=year%>年<%=month + 1%>月<%=day%>日<BR>
+      <%=hour%>時<%=minute%>分
     </h1>
     <br>
     <form method = "POST" action = "personaltimecard">
-      <input type = "hidden" name = "hidUuid" value = "">
-      <button type = "submit" name = "btnClockIn" value = "">出勤</button>
-      <button type = "submit" name = "btnClockOut" value = "">退勤</button><BR>
+      <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
+      <button type = "submit" name = "btnClockIn" value = "btnClockIn">出勤</button>
+      <button type = "submit" name = "btnClockOut" value = "btnClockOut">退勤</button><BR>
     </form>
     <form method = "POST" action = "personaltimecard">
       <select name = "selectYear" required>
@@ -55,7 +62,7 @@
         <option value = "1">1</option>
         <option value = "2">2</option>
         <option value = "3">3</option>
-        <option value = "4">5</option>
+        <option value = "4">4</option>
         <option value = "5">5</option>
         <option value = "6">6</option>
         <option value = "7">7</option>
@@ -65,7 +72,8 @@
         <option value = "11">11</option>
         <option value = "12">12</option>
       </select>月
-      <button type = "submit" name = "btnList" value = "">一覧表示</button>
+      <button type = "submit" name = "btnList" value = "btnList">一覧表示</button>
     </form>
+    <%} %>
   </body>
 </html>
