@@ -4,7 +4,7 @@
 package personaltimecard;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PersonalTimeCardServlet extends HttpServlet {
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp){
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
 		String year = req.getParameter("year");
 		String month = req.getParameter("month");
@@ -29,18 +29,27 @@ public class PersonalTimeCardServlet extends HttpServlet {
 		personaltimecard.registerDate(timecard);
 		String uuid = personaltimecard.getTodayUuid(year, month, day);
 		req.setAttribute("hidUuid", uuid);
-		getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+		try {
+			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+		}
+		catch (ServletException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
-		req.setCharacterEncoding("UTF-8");
-
-		if("btnList".equals(req.getParameter("btnList"))){
-			String year = req.getParameter("selectYear");
-			String month = req.getParameter("selectMonth");
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			try {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp){
+		try {
+			req.setCharacterEncoding("UTF-8");
+			if("btnList".equals(req.getParameter("btnList"))){
+				String year = req.getParameter("selectYear");
+				String month = req.getParameter("selectMonth");
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				List<TimeCard> list = personaltimecard.getCurrentList(year, month);
 				TimeCard timecard = null;
 				int size = list.size();
@@ -60,134 +69,142 @@ public class PersonalTimeCardServlet extends HttpServlet {
 					req.setAttribute("lblDepartureHour" + i, departureHour);
 					req.setAttribute("lblDepartureMinute" + i, departureMinute);
 				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 
-			getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
-		}
-		else if("btnArrival".equals(req.getParameter("btnArrival")))
-		{
-			Calendar cal = Calendar.getInstance();
-			String year = String.valueOf(cal.get(Calendar.YEAR));
-			String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
-			String day = String.valueOf(cal.get(Calendar.DATE));
-			String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
-			String minute = String.valueOf(cal.get(Calendar.MINUTE));
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			String dateUuid = personaltimecard.getTodayUuid(year, month, day);
-			TimeCard timecard = new TimeCard(dateUuid, hour, minute, null, null);
-			registerTime(timecard);
-			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
-		}
-		else if("btnDeparture".equals(req.getParameter("btnDeparture")))
-		{
-			Calendar cal = Calendar.getInstance();
-			String year = String.valueOf(cal.get(Calendar.YEAR));
-			String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
-			String day = String.valueOf(cal.get(Calendar.DATE));
-			String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
-			String minute = String.valueOf(cal.get(Calendar.MINUTE));
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			String dateUuid = personaltimecard.getTodayUuid(year, month, day);
-			TimeCard timecard = new TimeCard(dateUuid, null, null, hour, minute);
-			registerTime(timecard);
-			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
-		}
-		else if("btnBack001".equals(req.getParameter("btnBack")))
-		{
-			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
-		}
-		else if("btnModify".equals(req.getParameter("btnModify")))
-		{
-			String uuid = req.getParameter("hidUuid");
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			TimeCard timecard = personaltimecard.getModifyHistory(uuid);
-			List<String> arrivalList = timecard.getArrivalList();
-			List<String> arrivalRegisteredDatetime = timecard.getArrivalRegisteredDatetime();
-			List<String> departureList = timecard.getDepartureList();
-			List<String> departureRegisteredDatetime = timecard.getDepartureRegisteredDatetime();
-			int arrivalSize = arrivalList.size();
-			for(int i = 0; i < arrivalSize ; i++){
-				req.setAttribute("lblArrival" + i, arrivalList.get(i));
-				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+				getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
 			}
+			else if("btnArrival".equals(req.getParameter("btnArrival")))
+			{
+				Calendar cal = Calendar.getInstance();
+				String year = String.valueOf(cal.get(Calendar.YEAR));
+				String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
+				String day = String.valueOf(cal.get(Calendar.DATE));
+				String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
+				String minute = String.valueOf(cal.get(Calendar.MINUTE));
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				String dateUuid = personaltimecard.getTodayUuid(year, month, day);
+				TimeCard timecard = new TimeCard(dateUuid, hour, minute, null, null);
+				registerTime(timecard);
+				getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+			}
+			else if("btnDeparture".equals(req.getParameter("btnDeparture")))
+			{
+				Calendar cal = Calendar.getInstance();
+				String year = String.valueOf(cal.get(Calendar.YEAR));
+				String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
+				String day = String.valueOf(cal.get(Calendar.DATE));
+				String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
+				String minute = String.valueOf(cal.get(Calendar.MINUTE));
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				String dateUuid = personaltimecard.getTodayUuid(year, month, day);
+				TimeCard timecard = new TimeCard(dateUuid, null, null, hour, minute);
+				registerTime(timecard);
+				getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+			}
+			else if("btnBack001".equals(req.getParameter("btnBack")))
+			{
+				getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+			}
+			else if("btnModify".equals(req.getParameter("btnModify")))
+			{
+				String uuid = req.getParameter("hidUuid");
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				TimeCard timecard = personaltimecard.getModifyHistory(uuid);
+				List<String> arrivalList = timecard.getArrivalList();
+				List<String> arrivalRegisteredDatetime = timecard.getArrivalRegisteredDatetime();
+				List<String> departureList = timecard.getDepartureList();
+				List<String> departureRegisteredDatetime = timecard.getDepartureRegisteredDatetime();
+				int arrivalSize = arrivalList.size();
+				for(int i = 0; i < arrivalSize ; i++){
+					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+				}
 
-			int departureSize = departureList.size();
-			for(int i = 0 ; i < departureSize ; i ++){
-				req.setAttribute("lblDeparture" + i , departureList.get(i));
-				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+				int departureSize = departureList.size();
+				for(int i = 0 ; i < departureSize ; i ++){
+					req.setAttribute("lblDeparture" + i , departureList.get(i));
+					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+				}
+				req.setAttribute("arrivalSize", arrivalSize);
+				req.setAttribute("departureSize", departureSize);
+				req.setAttribute("hidUuid", uuid);
+				getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 			}
-			req.setAttribute("arrivalSize", arrivalSize);
-			req.setAttribute("departureSize", departureSize);
-			req.setAttribute("hidUuid", uuid);
-			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
+			else if("btnModifyArrival".equals(req.getParameter("btnModifyArrival")))
+			{
+				String uuid = req.getParameter("hidUuid");
+				String arrivalHour = req.getParameter("selectArrivalHour");
+				String arrivalMinute = req.getParameter("selectArrivalMinute");
+				TimeCard timecard = new TimeCard(uuid, arrivalHour, arrivalMinute, null, null);
+				modifyTime(timecard);
+
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
+				List<String> arrivalList = timecard1.getArrivalList();
+				List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
+				List<String> departureList = timecard1.getDepartureList();
+				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
+				int arrivalSize = arrivalList.size();
+				for(int i = 0; i < arrivalSize ; i++){
+					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+				}
+
+				int departureSize = departureList.size();
+				for(int i = 0 ; i < departureSize ; i ++){
+					req.setAttribute("lblDeparture" + i , departureList.get(i));
+					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+				}
+				req.setAttribute("arrivalSize", arrivalSize);
+				req.setAttribute("departureSize", departureSize);
+				req.setAttribute("hidUuid", uuid);
+				getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
+			}
+			else if("btnModifyDeparture".equals(req.getParameter("btnModifyDeparture")))
+			{
+				String uuid = req.getParameter("hidUuid");
+				String departureHour = req.getParameter("selectDepartureHour");
+				String departureMinute = req.getParameter("selectDepartureMinute");
+				TimeCard timecard = new TimeCard(uuid, null, null, departureHour, departureMinute);
+				modifyTime(timecard);
+
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
+				List<String> arrivalList = timecard1.getArrivalList();
+				List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
+				List<String> departureList = timecard1.getDepartureList();
+				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
+				int arrivalSize = arrivalList.size();
+				for(int i = 0; i < arrivalSize ; i++){
+					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+				}
+
+				int departureSize = departureList.size();
+				for(int i = 0 ; i < departureSize ; i ++){
+					req.setAttribute("lblDeparture" + i , departureList.get(i));
+					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+				}
+				req.setAttribute("arrivalSize", arrivalSize);
+				req.setAttribute("departureSize", departureSize);
+				req.setAttribute("hidUuid", uuid);
+				getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
+			}
+			else if("btnBack002".equals(req.getParameter("btnBack")))
+			{
+				getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
+			}
 		}
-		else if("btnModifyArrival".equals(req.getParameter("btnModifyArrival")))
+		catch (UnsupportedEncodingException e)
 		{
-			String uuid = req.getParameter("hidUuid");
-			String arrivalHour = req.getParameter("selectArrivalHour");
-			String arrivalMinute = req.getParameter("selectArrivalMinute");
-			TimeCard timecard = new TimeCard(uuid, arrivalHour, arrivalMinute, null, null);
-			modifyTime(timecard);
-
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
-			List<String> arrivalList = timecard1.getArrivalList();
-			List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
-			List<String> departureList = timecard1.getDepartureList();
-			List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
-			int arrivalSize = arrivalList.size();
-			for(int i = 0; i < arrivalSize ; i++){
-				req.setAttribute("lblArrival" + i, arrivalList.get(i));
-				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
-			}
-
-			int departureSize = departureList.size();
-			for(int i = 0 ; i < departureSize ; i ++){
-				req.setAttribute("lblDeparture" + i , departureList.get(i));
-				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
-			}
-			req.setAttribute("arrivalSize", arrivalSize);
-			req.setAttribute("departureSize", departureSize);
-			req.setAttribute("hidUuid", uuid);
-			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
+			e.printStackTrace();
 		}
-		else if("btnModifyDeparture".equals(req.getParameter("btnModifyDeparture")))
+		catch (ServletException e)
 		{
-			String uuid = req.getParameter("hidUuid");
-			String departureHour = req.getParameter("selectDepartureHour");
-			String departureMinute = req.getParameter("selectDepartureMinute");
-			TimeCard timecard = new TimeCard(uuid, null, null, departureHour, departureMinute);
-			modifyTime(timecard);
-
-			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
-			List<String> arrivalList = timecard1.getArrivalList();
-			List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
-			List<String> departureList = timecard1.getDepartureList();
-			List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
-			int arrivalSize = arrivalList.size();
-			for(int i = 0; i < arrivalSize ; i++){
-				req.setAttribute("lblArrival" + i, arrivalList.get(i));
-				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
-			}
-
-			int departureSize = departureList.size();
-			for(int i = 0 ; i < departureSize ; i ++){
-				req.setAttribute("lblDeparture" + i , departureList.get(i));
-				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
-			}
-			req.setAttribute("arrivalSize", arrivalSize);
-			req.setAttribute("departureSize", departureSize);
-			req.setAttribute("hidUuid", uuid);
-			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
+			e.printStackTrace();
 		}
-		else if("btnBack002".equals(req.getParameter("btnBack")))
+		catch (IOException e)
 		{
-			getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
+			e.printStackTrace();
 		}
 	}
 

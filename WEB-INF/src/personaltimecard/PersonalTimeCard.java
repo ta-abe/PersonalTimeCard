@@ -15,38 +15,49 @@ public class PersonalTimeCard {
 	private final String dbUser = "root";
 	private final String dbPass = "8121";
 
-	public List<TimeCard> getCurrentList(String year, String month) throws ClassNotFoundException, SQLException{
+	public List<TimeCard> getCurrentList(String year, String month){
 		List<TimeCard> array = new ArrayList<TimeCard>();
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection conn = null;
-		conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-		String sql = "SELECT * FROM DATE WHERE YEAR = ? AND MONTH = ? ORDER BY YEAR,MONTH,CAST(DAY AS SIGNED)";
-		PreparedStatement pst = conn.prepareStatement(sql);
-		pst.setString(1, year);
-		pst.setString(2, month);
-		ResultSet rs = pst.executeQuery();
-		while(rs.next()){
-			String day = rs.getString("DAY");
-			String dateUuid = rs.getString("UUID");
-			sql = "SELECT * FROM ARRIVAL WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
-			PreparedStatement pst2 = conn.prepareStatement(sql);
-			pst2.setString(1, dateUuid);
-			ResultSet rs2 = pst2.executeQuery();
-			rs2.next();
-			String arrivalHour = rs2.getString("ARRIVAL_HOUR");
-			String arrivalMinute = rs2.getString("ARRIVAL_MINUTE");
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection conn = null;
+			conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+			String sql = "SELECT * FROM DATE WHERE YEAR = ? AND MONTH = ? ORDER BY YEAR,MONTH,CAST(DAY AS SIGNED)";
+			PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, year);
+			pst.setString(2, month);
+			ResultSet rs = pst.executeQuery();
+			while(rs.next()){
+				String day = rs.getString("DAY");
+				String dateUuid = rs.getString("UUID");
+				sql = "SELECT * FROM ARRIVAL WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+				PreparedStatement pst2 = conn.prepareStatement(sql);
+				pst2.setString(1, dateUuid);
+				ResultSet rs2 = pst2.executeQuery();
+				rs2.next();
+				String arrivalHour = rs2.getString("ARRIVAL_HOUR");
+				String arrivalMinute = rs2.getString("ARRIVAL_MINUTE");
 
-			sql = "SELECT * FROM DEPARTURE WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
-			PreparedStatement pst3 = conn.prepareStatement(sql);
-			pst3.setString(1, dateUuid);
-			ResultSet rs3 = pst3.executeQuery();
-			rs3.next();
-			String departureHour = rs3.getString("DEPARTURE_HOUR");
-			String departureMinute = rs3.getString("DEPARTURE_MINUTE");
+				sql = "SELECT * FROM DEPARTURE WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+				PreparedStatement pst3 = conn.prepareStatement(sql);
+				pst3.setString(1, dateUuid);
+				ResultSet rs3 = pst3.executeQuery();
+				rs3.next();
+				String departureHour = rs3.getString("DEPARTURE_HOUR");
+				String departureMinute = rs3.getString("DEPARTURE_MINUTE");
 
-			TimeCard timecard = new TimeCard(dateUuid, day, arrivalHour, arrivalMinute, departureHour, departureMinute);
-			array.add(timecard);
+				TimeCard timecard = new TimeCard(dateUuid, day, arrivalHour, arrivalMinute, departureHour, departureMinute);
+				array.add(timecard);
+			}
 		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
 		return array;
 	}
 
