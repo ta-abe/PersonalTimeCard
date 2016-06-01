@@ -50,7 +50,6 @@
       <button type = "submit" name = "btnList" value = "btnList">一覧表示</button><BR>
       </form>
       <h2>出勤時刻一覧</h2>
-      <form method = "POST" action = "personaltimecard">
       <table border = "1">
         <tr>
           <th>日付</th>
@@ -67,14 +66,19 @@
         }
         for(int i = 0; i < j; i++){%>
           <tr>
-            <th><label name = "lblDay"><%=request.getAttribute("lblDay" + i)%></label></th>
-            <th><label name = "lblClockInHour"><%=request.getAttribute("lblClockInHour" + i)%>:<%=request.getAttribute("lblClockInMinute" + i)%></label></th>
-            <th><label name = "lblClockOut"><%=request.getAttribute("lblClockOutHour" + i)%>:<%=request.getAttribute("lblClockOutMinute" + i)%></label></th>
-            <th><button type = "submit" name  = "btnModify" value = "btnModify">修正</button></th>
+            <form method = "post" action = "personaltimecard">
+              <th><label name = "lblDay"><%=request.getAttribute("lblDay" + i)%></label></th>
+              <th><label name = "lblArrivalHour"><%=request.getAttribute("lblArrivalHour" + i)%>:<%=request.getAttribute("lblArrivalMinute" + i)%></label></th>
+              <th><label name = "lblDeparture"><%=request.getAttribute("lblDepartureHour" + i)%>:<%=request.getAttribute("lblDepartureMinute" + i)%></label></th>
+              <th><button type = "submit" name  = "btnModify" value = "btnModify">修正</button>
+              <input type = "hidden" name = "hidUuid" value = <%=request.getAttribute("hidUuid" + i) %>></th>
+            </form>
           </tr>
         <%} %>
       </table>
-      <button type = "submit" name = "btnBack" value = "btnBack001">戻る</button>
+
+      <form method = "POST" action = "personaltimecard">
+        <button type = "submit" name = "btnBack" value = "btnBack001">戻る</button>
       </form>
   </body>
 </html>

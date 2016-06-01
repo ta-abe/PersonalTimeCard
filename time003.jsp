@@ -4,13 +4,13 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Insert title here</title>
+    <title>修正画面</title>
   </head>
   <body>
     <form method = "POST" action = "personaltimecard">
           <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
       <h2>出勤時刻
-        <select name = "selectClockInHour">
+        <select name = "selectArrivalHour">
         <option value = "00">00</option>
         <option value = "01">01</option>
         <option value = "02">02</option>
@@ -37,7 +37,7 @@
         <option value = "23">23</option>
         </select>
         時
-        <select name = "selectClockInMinute">
+        <select name = "selectArrivalMinute">
         <option value = "00">00</option>
         <option value = "01">01</option>
         <option value = "02">02</option>
@@ -100,10 +100,10 @@
         <option value = "59">59</option>
       </select>
         分
-        <button type = "submit" name = "btnModifyClockIn" value = "btnModifyClockIn">修正</button>
+        <button type = "submit" name = "btnModifyArrival" value = "btnModifyArrival">修正</button>
       </h2>
       <h2>退勤時刻
-        <select name = "selectClockOutHour">
+        <select name = "selectDepartureHour">
         <option value = "00">00</option>
         <option value = "01">01</option>
         <option value = "02">02</option>
@@ -130,7 +130,7 @@
         <option value = "23">23</option>
         </select>
         時
-        <select name = "selectClockOutMinute">
+        <select name = "selectDepartureMinute">
         <option value = "00">00</option>
         <option value = "01">01</option>
         <option value = "02">02</option>
@@ -193,7 +193,7 @@
         <option value = "59">59</option>
         </select>
         分
-        <button type = "submit" name = "btnModifyClockOut" value = "btnModifyClockOut">修正</button>
+        <button type = "submit" name = "btnModifyDeparture" value = "btnModifyDeparture">修正</button>
       </h2><BR>
       <button type = "submit" name = "btnBack" value = "btnBack002">戻る</button><BR><BR>
     </form>
@@ -202,10 +202,12 @@
         <th>出勤時刻</th>
         <th>登録日時</th>
       </tr>
-      <%for(int i = 0; i < 3; i++){ %>
+      <% Object size = request.getAttribute("arrivalSize");
+         int s  = Integer.parseInt(size.toString());
+      for(int i = 0; i < s; i++){ %>
         <tr>
-          <th><label>lblClockIn<%=i + 1 %></label></th>
-          <th><label>lblRegister<%=i + 1 %></label></th>
+          <th><label><%=request.getAttribute("lblArrival" + i)%></label></th>
+          <th><label><%=request.getAttribute("lblArrivalRegistered" + i) %></label></th>
         </tr>
       <%} %>
     </table><BR><BR>
@@ -214,10 +216,12 @@
         <th>退勤時刻</th>
         <th>登録日時</th>
       </tr>
-      <%for(int i = 0; i < 4; i++){ %>
+      <% size = request.getAttribute("departureSize");
+         s = Integer.parseInt(size.toString());
+         for(int i = 0; i < s; i++){ %>
         <tr>
-          <th><label>lblClockOut<%=i + 1 %></label></th>
-          <th><label>lblRegister<%=i + 1 %></label></th>
+          <th><label><%=request.getAttribute("lblDeparture" + i)%></label></th>
+          <th><label><%=request.getAttribute("lblDepartureRegistered" + i)%></label></th>
         </tr>
       <%} %>
     </table>

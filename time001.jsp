@@ -29,8 +29,8 @@
     <br>
     <form method = "POST" action = "personaltimecard">
       <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
-      <button type = "submit" name = "btnClockIn" value = "btnClockIn">出勤</button>
-      <button type = "submit" name = "btnClockOut" value = "btnClockOut">退勤</button><BR>
+      <button type = "submit" name = "btnArrival" value = "btnArrival">出勤</button>
+      <button type = "submit" name = "btnDeparture" value = "btnDeparture">退勤</button><BR>
     </form>
     <form method = "POST" action = "personaltimecard">
       <select name = "selectYear" required>

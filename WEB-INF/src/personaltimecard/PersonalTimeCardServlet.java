@@ -47,28 +47,28 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				req.setAttribute("size", size);
 				for(int i = 0;i < size;i++){
 					timecard = list.get(i);
+					String dateUuid = timecard.getDateUuid();
 					String day = timecard.getDay();
-					String clockInHour = timecard.getClockInHour();
-					String clockInMinute = timecard.getClockInMinute();
-					String clockOutHour = timecard.getClockOuthour();
-					String clockOutMinute = timecard.getClockOutMinute();
+					String arrivalHour = timecard.getArrivalHour();
+					String arrivalMinute = timecard.getArrivalMinute();
+					String departureHour = timecard.getDeparturehour();
+					String departureMinute = timecard.getDepartureMinute();
+					req.setAttribute("hidUuid" + i, dateUuid);
 					req.setAttribute("lblDay" + i, day);
-					req.setAttribute("lblClockInHour" + i, clockInHour);
-					req.setAttribute("lblClockInMinute" + i, clockInMinute);
-					req.setAttribute("lblClockOutHour" + i, clockOutHour);
-					req.setAttribute("lblClockOutMinute" + i, clockOutMinute);
+					req.setAttribute("lblArrivalHour" + i, arrivalHour);
+					req.setAttribute("lblArrivalMinute" + i, arrivalMinute);
+					req.setAttribute("lblDepartureHour" + i, departureHour);
+					req.setAttribute("lblDepartureMinute" + i, departureMinute);
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			} catch (SQLException e) {
-				// TODO 自動生成された catch ブロック
 				e.printStackTrace();
 			}
 
 			getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
 		}
-		else if("btnClockIn".equals(req.getParameter("btnClockIn")))
+		else if("btnArrival".equals(req.getParameter("btnArrival")))
 		{
 			Calendar cal = Calendar.getInstance();
 			String year = String.valueOf(cal.get(Calendar.YEAR));
@@ -76,14 +76,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 			String day = String.valueOf(cal.get(Calendar.DATE));
 			String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
 			String minute = String.valueOf(cal.get(Calendar.MINUTE));
-			String uuid = java.util.UUID.randomUUID().toString();
 			PersonalTimeCard personaltimecard = new PersonalTimeCard();
 			String dateUuid = personaltimecard.getTodayUuid(year, month, day);
-			TimeCard timecard = new TimeCard(uuid, dateUuid, hour, minute, null, null);
-			registerClock(timecard);
+			TimeCard timecard = new TimeCard(dateUuid, hour, minute, null, null);
+			registerTime(timecard);
 			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 		}
-		else if("btnClockOut".equals(req.getParameter("btnClockOut")))
+		else if("btnDeparture".equals(req.getParameter("btnDeparture")))
 		{
 			Calendar cal = Calendar.getInstance();
 			String year = String.valueOf(cal.get(Calendar.YEAR));
@@ -91,11 +90,10 @@ public class PersonalTimeCardServlet extends HttpServlet {
 			String day = String.valueOf(cal.get(Calendar.DATE));
 			String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
 			String minute = String.valueOf(cal.get(Calendar.MINUTE));
-			String uuid = java.util.UUID.randomUUID().toString();
 			PersonalTimeCard personaltimecard = new PersonalTimeCard();
 			String dateUuid = personaltimecard.getTodayUuid(year, month, day);
-			TimeCard timecard = new TimeCard(uuid, dateUuid, null, null, hour, minute);
-			registerClock(timecard);
+			TimeCard timecard = new TimeCard(dateUuid, null, null, hour, minute);
+			registerTime(timecard);
 			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 		}
 		else if("btnBack001".equals(req.getParameter("btnBack")))
@@ -104,29 +102,87 @@ public class PersonalTimeCardServlet extends HttpServlet {
 		}
 		else if("btnModify".equals(req.getParameter("btnModify")))
 		{
-			req.setAttribute("hidUuid", "acd9509f-a83c-418c-8405-c3219b2c7dac");//テスト用UUID
+			String uuid = req.getParameter("hidUuid");
+			PersonalTimeCard personaltimecard = new PersonalTimeCard();
+			TimeCard timecard = personaltimecard.getModifyHistory(uuid);
+			List<String> arrivalList = timecard.getArrivalList();
+			List<String> arrivalRegisteredDatetime = timecard.getArrivalRegisteredDatetime();
+			List<String> departureList = timecard.getDepartureList();
+			List<String> departureRegisteredDatetime = timecard.getDepartureRegisteredDatetime();
+			int arrivalSize = arrivalList.size();
+			for(int i = 0; i < arrivalSize ; i++){
+				req.setAttribute("lblArrival" + i, arrivalList.get(i));
+				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+			}
+
+			int departureSize = departureList.size();
+			for(int i = 0 ; i < departureSize ; i ++){
+				req.setAttribute("lblDeparture" + i , departureList.get(i));
+				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+			}
+			req.setAttribute("arrivalSize", arrivalSize);
+			req.setAttribute("departureSize", departureSize);
+			req.setAttribute("hidUuid", uuid);
 			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 		}
-		else if("btnModifyClockIn".equals(req.getParameter("btnModifyClockIn")))
+		else if("btnModifyArrival".equals(req.getParameter("btnModifyArrival")))
 		{
-			String uuid = java.util.UUID.randomUUID().toString();
-			String dateUuid = req.getParameter("hidUuid");
-			String clockInHour = req.getParameter("selectClockInHour");
-			String clockInMinute = req.getParameter("selectClockInMinute");
-			TimeCard timecard = new TimeCard(uuid, dateUuid, clockInHour, clockInMinute, null, null);
-			modifyClock(timecard);
-			req.setAttribute("hidUuid", dateUuid);
+			String uuid = req.getParameter("hidUuid");
+			String arrivalHour = req.getParameter("selectArrivalHour");
+			String arrivalMinute = req.getParameter("selectArrivalMinute");
+			TimeCard timecard = new TimeCard(uuid, arrivalHour, arrivalMinute, null, null);
+			modifyTime(timecard);
+
+			PersonalTimeCard personaltimecard = new PersonalTimeCard();
+			TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
+			List<String> arrivalList = timecard1.getArrivalList();
+			List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
+			List<String> departureList = timecard1.getDepartureList();
+			List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
+			int arrivalSize = arrivalList.size();
+			for(int i = 0; i < arrivalSize ; i++){
+				req.setAttribute("lblArrival" + i, arrivalList.get(i));
+				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+			}
+
+			int departureSize = departureList.size();
+			for(int i = 0 ; i < departureSize ; i ++){
+				req.setAttribute("lblDeparture" + i , departureList.get(i));
+				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+			}
+			req.setAttribute("arrivalSize", arrivalSize);
+			req.setAttribute("departureSize", departureSize);
+			req.setAttribute("hidUuid", uuid);
 			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 		}
-		else if("btnModifyClockOut".equals(req.getParameter("btnModifyClockOut")))
+		else if("btnModifyDeparture".equals(req.getParameter("btnModifyDeparture")))
 		{
-			String uuid = java.util.UUID.randomUUID().toString();
-			String dateUuid = req.getParameter("hidUuid");
-			String clockOutHour = req.getParameter("selectClockOutHour");
-			String clockOutMinute = req.getParameter("selectClockOutMinute");
-			TimeCard timecard = new TimeCard(uuid, dateUuid, null, null, clockOutHour, clockOutMinute);
-			modifyClock(timecard);
-			req.setAttribute("hidUuid", dateUuid);
+			String uuid = req.getParameter("hidUuid");
+			String departureHour = req.getParameter("selectDepartureHour");
+			String departureMinute = req.getParameter("selectDepartureMinute");
+			TimeCard timecard = new TimeCard(uuid, null, null, departureHour, departureMinute);
+			modifyTime(timecard);
+
+			PersonalTimeCard personaltimecard = new PersonalTimeCard();
+			TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
+			List<String> arrivalList = timecard1.getArrivalList();
+			List<String> arrivalRegisteredDatetime = timecard1.getArrivalRegisteredDatetime();
+			List<String> departureList = timecard1.getDepartureList();
+			List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
+			int arrivalSize = arrivalList.size();
+			for(int i = 0; i < arrivalSize ; i++){
+				req.setAttribute("lblArrival" + i, arrivalList.get(i));
+				req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
+			}
+
+			int departureSize = departureList.size();
+			for(int i = 0 ; i < departureSize ; i ++){
+				req.setAttribute("lblDeparture" + i , departureList.get(i));
+				req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
+			}
+			req.setAttribute("arrivalSize", arrivalSize);
+			req.setAttribute("departureSize", departureSize);
+			req.setAttribute("hidUuid", uuid);
 			getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 		}
 		else if("btnBack002".equals(req.getParameter("btnBack")))
@@ -135,13 +191,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 		}
 	}
 
-	private void registerClock(TimeCard timecard){
+	private void registerTime(TimeCard timecard){
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
-		personaltimecard.registerClock(timecard);
+		personaltimecard.registerTime(timecard);
 	}
 
-	private void modifyClock(TimeCard timecard){
+	private void modifyTime(TimeCard timecard){
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
-		personaltimecard.modifyClock(timecard);
+		personaltimecard.modifyTime(timecard);
 	}
 }

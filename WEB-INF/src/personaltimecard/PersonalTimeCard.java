@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class PersonalTimeCard {
 		Class.forName("com.mysql.jdbc.Driver");
 		Connection conn = null;
 		conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-		String sql = "SELECT * FROM DATE WHERE YEAR = ? AND MONTH = ? ORDER BY YEAR,MONTH,CAST(day as signed)";
+		String sql = "SELECT * FROM DATE WHERE YEAR = ? AND MONTH = ? ORDER BY YEAR,MONTH,CAST(DAY AS SIGNED)";
 		PreparedStatement pst = conn.prepareStatement(sql);
 		pst.setString(1, year);
 		pst.setString(2, month);
@@ -27,62 +28,106 @@ public class PersonalTimeCard {
 		while(rs.next()){
 			String day = rs.getString("DAY");
 			String dateUuid = rs.getString("UUID");
-			sql = "SELECT * FROM CLOCK_IN WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+			sql = "SELECT * FROM ARRIVAL WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
 			PreparedStatement pst2 = conn.prepareStatement(sql);
 			pst2.setString(1, dateUuid);
 			ResultSet rs2 = pst2.executeQuery();
 			rs2.next();
-			String clockInHour = rs2.getString("CLOCK_IN_HOUR");
-			String clockInMinute = rs2.getString("CLOCK_IN_MINUTE");
+			String arrivalHour = rs2.getString("ARRIVAL_HOUR");
+			String arrivalMinute = rs2.getString("ARRIVAL_MINUTE");
 
-			sql = "SELECT * FROM CLOCK_OUT WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+			sql = "SELECT * FROM DEPARTURE WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
 			PreparedStatement pst3 = conn.prepareStatement(sql);
 			pst3.setString(1, dateUuid);
 			ResultSet rs3 = pst3.executeQuery();
 			rs3.next();
-			String clockOutHour = rs3.getString("CLOCK_OUT_HOUR");
-			String clockOutMinute = rs3.getString("CLOCK_OUT_MINUTE");
+			String departureHour = rs3.getString("DEPARTURE_HOUR");
+			String departureMinute = rs3.getString("DEPARTURE_MINUTE");
 
-			TimeCard timecard = new TimeCard(day, clockInHour, clockInMinute, clockOutHour, clockOutMinute);
+			TimeCard timecard = new TimeCard(dateUuid, day, arrivalHour, arrivalMinute, departureHour, departureMinute);
 			array.add(timecard);
 		}
 		return array;
 	}
 
-	public List<TimeCard> getModifyHistory(String dateUuid){
-		return null;
+	public TimeCard getModifyHistory(String dateUuid) {
+		TimeCard timecard = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection conn = null;
+			conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+			String sql = "SELECT * FROM ARRIVAL WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+			PreparedStatement pst = conn.prepareStatement(sql);
+			pst.setString(1, dateUuid);
+			ResultSet rs = pst.executeQuery();
+			List<String> arrivalList = new ArrayList<String>();
+			List<String> arrivalRegisteredList = new ArrayList<String>();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd' 'HH':'mm':'ss");
+			while(rs.next()){
+				String arrivalHour = rs.getString("ARRIVAL_HOUR");
+				String arrivalMinute = rs.getString("ARRIVAL_MINUTE");
+				String arrivalRegisteredDatetime = sdf.format(rs.getTimestamp("REGISTERED_DATETIME"));
+				arrivalList.add(arrivalHour + ":" + arrivalMinute);
+				arrivalRegisteredList.add(arrivalRegisteredDatetime);
+			}
+
+			sql = "SELECT * FROM DEPARTURE WHERE DATE_UUID = ? ORDER BY REGISTERED_DATETIME DESC";
+			PreparedStatement pst2 = conn.prepareStatement(sql);
+			pst2.setString(1, dateUuid);
+			ResultSet rs2 = pst2.executeQuery();
+			List<String> departureList = new ArrayList<String>();
+			List<String> departureRegisteredList = new ArrayList<String>();
+			while(rs2.next()){
+				String departureHour = rs2.getString("DEPARTURE_HOUR");
+				String departureMinute = rs2.getString("DEPARTURE_MINUTE");
+				String departureRegisteredDatetime = sdf.format(rs2.getTimestamp("REGISTERED_DATETIME"));
+				departureList.add(departureHour + ":" + departureMinute);
+				departureRegisteredList.add(departureRegisteredDatetime);
+			}
+
+			timecard = new TimeCard(arrivalList, arrivalRegisteredList, departureList, departureRegisteredList);
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return timecard;
 	}
 
-	public void registerClock(TimeCard timecard){
+	public void registerTime(TimeCard timecard){
 		String uuid = timecard.getUuid();
 		String dateUuid = timecard.getDateUuid();
-		String clockInHour = timecard.getClockInHour();
-		String clockInMinute = timecard.getClockInMinute();
-		String clockOutHour = timecard.getClockOuthour();
-		String clockOutMinute = timecard.getClockOutMinute();
+		String arrivalHour = timecard.getArrivalHour();
+		String arrivalMinute = timecard.getArrivalMinute();
+		String departureHour = timecard.getDeparturehour();
+		String departureMinute = timecard.getDepartureMinute();
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection conn = null;
 			conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-			if(clockOutHour == null && clockOutMinute == null){
-				String sql = "INSERT INTO CLOCK_IN(UUID, DATE_UUID, CLOCK_IN_HOUR, CLOCK_IN_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME) WHERE NOT EXISTS(SELECT UUID FROM CLOCK_IN WHERE DATE_UUID = ?)";
+			if(departureHour == null && departureMinute == null){
+				String sql = "INSERT INTO ARRIVAL(UUID, DATE_UUID, ARRIVAL_HOUR, ARRIVAL_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME) WHERE NOT EXISTS(SELECT UUID FROM ARRIVAL WHERE DATE_UUID = ?)";
 				PreparedStatement pst = conn.prepareStatement(sql);
 				pst.setString(1, uuid);
 				pst.setString(2, dateUuid);
-				pst.setString(3, clockInHour);
-				pst.setString(4, clockInMinute);
+				pst.setString(3, arrivalHour);
+				pst.setString(4, arrivalMinute);
 				pst.setString(5, dateUuid);
 				pst.executeUpdate();
 			}
-			else if(clockInHour == null && clockInMinute == null)
+			else if(arrivalHour == null && arrivalMinute == null)
 			{
-				String sql = "INSERT INTO CLOCK_OUT(UUID, DATE_UUID, CLOCK_OUT_HOUR, CLOCK_OUT_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME) WHERE NOT EXISTS(SELECT UUID FROM CLOCK_OUT WHERE DATE_UUID = ?)";
+				String sql = "INSERT INTO DEPARTURE(UUID, DATE_UUID, DEPARTURE_HOUR, DEPARTURE_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME) WHERE NOT EXISTS(SELECT UUID FROM DEPARTURE WHERE DATE_UUID = ?)";
 				PreparedStatement pst = conn.prepareStatement(sql);
 				pst.setString(1, uuid);
 				pst.setString(2, dateUuid);
-				pst.setString(3, clockOutHour);
-				pst.setString(4, clockOutMinute);
+				pst.setString(3, departureHour);
+				pst.setString(4, departureMinute);
 				pst.setString(5, dateUuid);
 				pst.executeUpdate();
 			}
@@ -99,35 +144,35 @@ public class PersonalTimeCard {
 
 	}
 
-	public void modifyClock(TimeCard timecard){
+	public void modifyTime(TimeCard timecard){
 		String uuid = timecard.getUuid();
 		String dateUuid = timecard.getDateUuid();
-		String clockInHour = timecard.getClockInHour();
-		String clockInMinute = timecard.getClockInMinute();
-		String clockOutHour = timecard.getClockOuthour();
-		String clockOutMinute = timecard.getClockOutMinute();
+		String arrivalHour = timecard.getArrivalHour();
+		String arrivalMinute = timecard.getArrivalMinute();
+		String departureHour = timecard.getDeparturehour();
+		String departureMinute = timecard.getDepartureMinute();
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection conn = null;
 			conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-			if(clockOutHour == null && clockOutMinute == null){
-				String sql = "INSERT INTO CLOCK_IN(UUID, DATE_UUID, CLOCK_IN_HOUR, CLOCK_IN_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME)";
+			if(departureHour == null && departureMinute == null){
+				String sql = "INSERT INTO ARRIVAL(UUID, DATE_UUID, ARRIVAL_HOUR, ARRIVAL_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME)";
 				PreparedStatement pst = conn.prepareStatement(sql);
 				pst.setString(1, uuid);
 				pst.setString(2, dateUuid);
-				pst.setString(3, clockInHour);
-				pst.setString(4, clockInMinute);
+				pst.setString(3, arrivalHour);
+				pst.setString(4, arrivalMinute);
 				pst.executeUpdate();
 			}
-			else if(clockInHour == null && clockInMinute == null)
+			else if(arrivalHour == null && arrivalMinute == null)
 			{
-				String sql = "INSERT INTO CLOCK_OUT(UUID, DATE_UUID, CLOCK_OUT_HOUR, CLOCK_OUT_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME)";
+				String sql = "INSERT INTO DEPARTURE(UUID, DATE_UUID, DEPARTURE_HOUR, DEPARTURE_MINUTE, REGISTERED_DATETIME)SELECT ?,?,?,?,CAST(NOW() AS DATETIME)";
 				PreparedStatement pst = conn.prepareStatement(sql);
 				pst.setString(1, uuid);
 				pst.setString(2, dateUuid);
-				pst.setString(3, clockOutHour);
-				pst.setString(4, clockOutMinute);
+				pst.setString(3, departureHour);
+				pst.setString(4, departureMinute);
 				pst.executeUpdate();
 			}
 		}

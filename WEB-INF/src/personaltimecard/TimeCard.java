@@ -1,15 +1,22 @@
 package personaltimecard;
 
+import java.util.List;
+
 public class TimeCard {
 	private String uuid = null;
 	private String year = null;
 	private String month = null;
 	private String day = null;
 	private String dateUuid = null;
-	private String clockInHour = null;
-	private String clockInMinute = null;
-	private String clockOutHour = null;
-	private String clockOutMinute = null;
+	private String arrivalHour = null;
+	private String arrivalMinute = null;
+	private String departureHour = null;
+	private String departureMinute = null;
+	private List<String> arrivalList = null;
+	private List<String> departureList = null;
+	private List<String> arrivalRegisteredDatetime = null;
+	private List<String> departureRegisteredDatetime = null;
+
 
 	public TimeCard(String year, String month, String day){
 		this.uuid = java.util.UUID.randomUUID().toString();
@@ -18,21 +25,30 @@ public class TimeCard {
 		this.day = day;
 	}
 
-	public TimeCard(String uuid, String dateUuid, String clockInHour, String clockInMinute, String clockOutHour, String clockOutMinute){
-		this.uuid = uuid;
+	public TimeCard(String dateUuid, String arrivalHour, String arrivalMinute, String departureHour, String departureMinute){
+		this.uuid = java.util.UUID.randomUUID().toString();
 		this.dateUuid = dateUuid;
-		this.clockInHour = clockInHour;
-		this.clockInMinute = clockInMinute;
-		this.clockOutHour = clockOutHour;
-		this.clockOutMinute = clockOutMinute;
+		this.arrivalHour = arrivalHour;
+		this.arrivalMinute = arrivalMinute;
+		this.departureHour = departureHour;
+		this.departureMinute = departureMinute;
 	}
 
-	public TimeCard(String day, String clockInHour, String clockInMinute, String clockOutHour, String clockOutMinute){
+	public TimeCard(String dateUuid , String day, String arrivalHour, String arrivalMinute, String departureHour, String departureMinute){
+		this.dateUuid = dateUuid;
 		this.day = day;
-		this.clockInHour = clockInHour;
-		this.clockInMinute = clockInMinute;
-		this.clockOutHour = clockOutHour;
-		this.clockOutMinute = clockOutMinute;
+		this.arrivalHour = arrivalHour;
+		this.arrivalMinute = arrivalMinute;
+		this.departureHour = departureHour;
+		this.departureMinute = departureMinute;
+	}
+
+	public TimeCard(List<String> arrivalList, List<String> arrivalRegisteredDatetime, List<String> departureList, List<String> departureRegisteredDatetime){
+		this.arrivalList = arrivalList;
+		this.arrivalRegisteredDatetime = arrivalRegisteredDatetime;
+		this.departureList = departureList;
+		this.departureRegisteredDatetime = departureRegisteredDatetime;
+
 	}
 
 	public String getUuid(){
@@ -54,19 +70,35 @@ public class TimeCard {
 		return dateUuid;
 	}
 
-	public String getClockInHour(){
-		return clockInHour;
+	public String getArrivalHour(){
+		return arrivalHour;
 	}
 
-	public String getClockInMinute(){
-		return clockInMinute;
+	public String getArrivalMinute(){
+		return arrivalMinute;
 	}
 
-	public String getClockOuthour(){
-		return clockOutHour;
+	public String getDeparturehour(){
+		return departureHour;
 	}
 
-	public String getClockOutMinute(){
-		return clockOutMinute;
+	public String getDepartureMinute(){
+		return departureMinute;
+	}
+
+	public List<String> getArrivalList(){
+		return arrivalList;
+	}
+
+	public List<String> getDepartureList(){
+		return departureList;
+	}
+
+	public List<String> getArrivalRegisteredDatetime(){
+		return arrivalRegisteredDatetime;
+	}
+
+	public List<String> getDepartureRegisteredDatetime(){
+		return departureRegisteredDatetime;
 	}
 }
