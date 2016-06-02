@@ -4,7 +4,7 @@
 package personaltimecard;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -21,16 +21,21 @@ public class PersonalTimeCardServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp){
-		PersonalTimeCard personaltimecard = new PersonalTimeCard();
-		String year = req.getParameter("year");
-		String month = req.getParameter("month");
-		String day = req.getParameter("day");
-		TimeCard timecard = new TimeCard(year, month, day);
-		personaltimecard.registerDate(timecard);
-		String uuid = personaltimecard.getTodayUuid(year, month, day);
-		req.setAttribute("hidUuid", uuid);
 		try {
+			req.setCharacterEncoding("UTF-8");
+			PersonalTimeCard personaltimecard = new PersonalTimeCard();
+			String year = req.getParameter("year");
+			String month = req.getParameter("month");
+			String day = req.getParameter("day");
+			TimeCard timecard = new TimeCard(year, month, day);
+			personaltimecard.registerDate(timecard);
+			String uuid = personaltimecard.getTodayUuid(year, month, day);
+			req.setAttribute("hidUuid", uuid);
 			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
 		}
 		catch (ServletException e)
 		{
@@ -69,7 +74,8 @@ public class PersonalTimeCardServlet extends HttpServlet {
 					req.setAttribute("lblDepartureHour" + i, departureHour);
 					req.setAttribute("lblDepartureMinute" + i, departureMinute);
 				}
-
+				req.setAttribute("year", year);
+				req.setAttribute("month", month);
 				getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
 			}
 			else if("btnArrival".equals(req.getParameter("btnArrival")))
@@ -80,6 +86,12 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				String day = String.valueOf(cal.get(Calendar.DATE));
 				String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
 				String minute = String.valueOf(cal.get(Calendar.MINUTE));
+				if(Integer.parseInt(hour) < 10){
+					hour = "0" + hour;
+				}
+				if(Integer.parseInt(minute) < 10){
+					minute = "0" + minute;
+				}
 				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				String dateUuid = personaltimecard.getTodayUuid(year, month, day);
 				TimeCard timecard = new TimeCard(dateUuid, hour, minute, null, null);
@@ -118,12 +130,14 @@ public class PersonalTimeCardServlet extends HttpServlet {
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
-
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize ; i ++){
 					req.setAttribute("lblDeparture" + i , departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
+				req.setAttribute("year", req.getParameter("hidYear"));
+				req.setAttribute("month", req.getParameter("hidMonth"));
+				req.setAttribute("day", req.getParameter("hidDay"));
 				req.setAttribute("arrivalSize", arrivalSize);
 				req.setAttribute("departureSize", departureSize);
 				req.setAttribute("hidUuid", uuid);
@@ -136,7 +150,6 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				String arrivalMinute = req.getParameter("selectArrivalMinute");
 				TimeCard timecard = new TimeCard(uuid, arrivalHour, arrivalMinute, null, null);
 				modifyTime(timecard);
-
 				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
 				List<String> arrivalList = timecard1.getArrivalList();
@@ -148,7 +161,6 @@ public class PersonalTimeCardServlet extends HttpServlet {
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
-
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize ; i ++){
 					req.setAttribute("lblDeparture" + i , departureList.get(i));
@@ -157,6 +169,9 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				req.setAttribute("arrivalSize", arrivalSize);
 				req.setAttribute("departureSize", departureSize);
 				req.setAttribute("hidUuid", uuid);
+				req.setAttribute("year", req.getParameter("hidYear"));
+				req.setAttribute("month", req.getParameter("hidMonth"));
+				req.setAttribute("day", req.getParameter("hidDay"));
 				getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 			}
 			else if("btnModifyDeparture".equals(req.getParameter("btnModifyDeparture")))
@@ -166,7 +181,6 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				String departureMinute = req.getParameter("selectDepartureMinute");
 				TimeCard timecard = new TimeCard(uuid, null, null, departureHour, departureMinute);
 				modifyTime(timecard);
-
 				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				TimeCard timecard1 = personaltimecard.getModifyHistory(uuid);
 				List<String> arrivalList = timecard1.getArrivalList();
@@ -178,7 +192,6 @@ public class PersonalTimeCardServlet extends HttpServlet {
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
-
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize ; i ++){
 					req.setAttribute("lblDeparture" + i , departureList.get(i));
@@ -187,16 +200,39 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				req.setAttribute("arrivalSize", arrivalSize);
 				req.setAttribute("departureSize", departureSize);
 				req.setAttribute("hidUuid", uuid);
+				req.setAttribute("year", req.getParameter("hidYear"));
+				req.setAttribute("month", req.getParameter("hidMonth"));
+				req.setAttribute("day", req.getParameter("hidDay"));
 				getServletConfig().getServletContext().getRequestDispatcher("/time003.jsp").forward(req, resp);
 			}
 			else if("btnBack002".equals(req.getParameter("btnBack")))
 			{
+				String year = req.getParameter("hidYear");
+				String month = req.getParameter("hidMonth");
+				PersonalTimeCard personaltimecard = new PersonalTimeCard();
+				List<TimeCard> list = personaltimecard.getCurrentList(year, month);
+				TimeCard timecard = null;
+				int size = list.size();
+				req.setAttribute("size", size);
+				for(int i = 0;i < size;i++){
+					timecard = list.get(i);
+					String dateUuid = timecard.getDateUuid();
+					String day = timecard.getDay();
+					String arrivalHour = timecard.getArrivalHour();
+					String arrivalMinute = timecard.getArrivalMinute();
+					String departureHour = timecard.getDeparturehour();
+					String departureMinute = timecard.getDepartureMinute();
+					req.setAttribute("hidUuid" + i, dateUuid);
+					req.setAttribute("lblDay" + i, day);
+					req.setAttribute("lblArrivalHour" + i, arrivalHour);
+					req.setAttribute("lblArrivalMinute" + i, arrivalMinute);
+					req.setAttribute("lblDepartureHour" + i, departureHour);
+					req.setAttribute("lblDepartureMinute" + i, departureMinute);
+				}
+				req.setAttribute("year", year);
+				req.setAttribute("month", month);
 				getServletConfig().getServletContext().getRequestDispatcher("/time002.jsp").forward(req, resp);
 			}
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			e.printStackTrace();
 		}
 		catch (ServletException e)
 		{
@@ -206,14 +242,28 @@ public class PersonalTimeCardServlet extends HttpServlet {
 		{
 			e.printStackTrace();
 		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	private void registerTime(TimeCard timecard){
+	/**
+	 * 新規に登録したいデータを受け取り、デーブルに登録する
+	 * @param timecard 新規登録用のデータが格納されたオブジェクト
+	 * @throws SQLException
+	 */
+	private void registerTime(TimeCard timecard) throws SQLException{
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
 		personaltimecard.registerTime(timecard);
 	}
 
-	private void modifyTime(TimeCard timecard){
+	/**
+	 * 修正用のデータを受け取り、テーブルに登録する
+	 * @param timecard 修正用のデータが格納されたオブジェクト
+	 * @throws SQLException
+	 */
+	private void modifyTime(TimeCard timecard) throws SQLException{
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
 		personaltimecard.modifyTime(timecard);
 	}

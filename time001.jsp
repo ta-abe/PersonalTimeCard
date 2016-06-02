@@ -15,22 +15,22 @@
     <title>初期画面</title>
   </head>
   <body>
-  <%
-  Object hiduuid = request.getAttribute("hidUuid");
-  if(null == hiduuid){ %>
+    <%
+      Object hiduuid = request.getAttribute("hidUuid");
+      if(null == hiduuid){
+    %>
     <form method = "GET" action = "personaltimecard">
-     <meta http-equiv = "refresh" content = "0;URL=http://localhost:8080/PersonalTimeCard/personaltimecard?year=<%=year%>&month=<%=month + 1%>&day=<%=day%>">
+       <meta http-equiv = "refresh" content = "0;URL=http://localhost:8080/PersonalTimeCard/personaltimecard?year=<%=year%>&month=<%=month + 1%>&day=<%=day%>">
     </form>
-  <%}else{%>
+    <%}else{%>
     <h1>
       <%=year%>年<%=month + 1%>月<%=day%>日<BR>
       <%=hour%>時<%=minute%>分
     </h1>
-    <br>
     <form method = "POST" action = "personaltimecard">
       <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
-      <button type = "submit" name = "btnArrival" value = "btnArrival">出勤</button>
-      <button type = "submit" name = "btnDeparture" value = "btnDeparture">退勤</button><BR>
+      <button type = "submit" name = "btnArrival" value = "btnArrival" style = "width : 81px; height : 50px"><h2>出勤</h2></button>
+      <button type = "submit" name = "btnDeparture" value = "btnDeparture" style = "width : 81px; height : 50px"><h2>退勤</h2></button><BR><BR>
     </form>
     <form method = "POST" action = "personaltimecard">
       <select name = "selectYear" required>
