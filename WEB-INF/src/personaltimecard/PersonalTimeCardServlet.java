@@ -59,7 +59,7 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				TimeCard timecard = null;
 				int size = list.size();
 				req.setAttribute("size", size);
-				for(int i = 0;i < size;i++){
+				for(int i = 0; i < size; i++){
 					timecard = list.get(i);
 					String dateUuid = timecard.getDateUuid();
 					String day = timecard.getDay();
@@ -126,13 +126,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureList = timecard.getDepartureList();
 				List<String> departureRegisteredDatetime = timecard.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
-				for(int i = 0; i < arrivalSize ; i++){
+				for(int i = 0; i < arrivalSize; i++){
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
-				for(int i = 0 ; i < departureSize ; i ++){
-					req.setAttribute("lblDeparture" + i , departureList.get(i));
+				for(int i = 0 ; i < departureSize; i ++){
+					req.setAttribute("lblDeparture" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("year", req.getParameter("hidYear"));
@@ -157,13 +157,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureList = timecard1.getDepartureList();
 				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
-				for(int i = 0; i < arrivalSize ; i++){
+				for(int i = 0; i < arrivalSize; i++){
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
-				for(int i = 0 ; i < departureSize ; i ++){
-					req.setAttribute("lblDeparture" + i , departureList.get(i));
+				for(int i = 0 ; i < departureSize; i ++){
+					req.setAttribute("lblDeparture" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("arrivalSize", arrivalSize);
@@ -188,13 +188,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureList = timecard1.getDepartureList();
 				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
-				for(int i = 0; i < arrivalSize ; i++){
+				for(int i = 0; i < arrivalSize; i++){
 					req.setAttribute("lblArrival" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
-				for(int i = 0 ; i < departureSize ; i ++){
-					req.setAttribute("lblDeparture" + i , departureList.get(i));
+				for(int i = 0 ; i < departureSize; i++){
+					req.setAttribute("lblDeparture" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("arrivalSize", arrivalSize);
@@ -214,7 +214,7 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				TimeCard timecard = null;
 				int size = list.size();
 				req.setAttribute("size", size);
-				for(int i = 0;i < size;i++){
+				for(int i = 0; i < size; i++){
 					timecard = list.get(i);
 					String dateUuid = timecard.getDateUuid();
 					String day = timecard.getDay();

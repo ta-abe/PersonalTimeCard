@@ -61,7 +61,7 @@ public class PersonalTimeCard {
 				pst3 = conn.prepareStatement(sql);
 				pst3.setString(1, dateUuid);
 				rs3 = pst3.executeQuery();
-				String departureHour =  "--";;
+				String departureHour = "--";;
 				String departureMinute = "--";
 				if(true == rs3.next()){
 					departureHour = rs3.getString("DEPARTURE_HOUR");
