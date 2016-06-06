@@ -55,13 +55,17 @@
     <h2>
       <%=year%>年<%=month%>月出退勤時刻一覧
     </h2>
+    <div>
     <table border = "1">
       <tr>
-        <th>日付</th>
-        <th>出勤時間</th>
-        <th>退勤時間</th>
-        <th></th>
+        <th width = "50">日付</th>
+        <th width = "100">出勤時間</th>
+        <th width = "100">退勤時間</th>
+        <th width = "80"></th>
       </tr>
+      </table>
+      <div style = "height:285px; width:380px; overflow-y:scroll">
+      <table border = 1>
       <%
          Object size = request.getAttribute("size");
          int j = 0;
@@ -75,7 +79,7 @@
       <tr>
         <form method = "post" action = "personaltimecard">
           <th width = "50"><label name = "lblDay"><%=request.getAttribute("lblDay" + i)%></label></th>
-          <th width = "100"><label name = "lblArrivalHour"><%=request.getAttribute("lblArrivalHour" + i)%>:<%=request.getAttribute("lblArrivalMinute" + i)%></label></th>
+          <th width = "100"><label name = "lblArrival"><%=request.getAttribute("lblArrivalHour" + i)%>:<%=request.getAttribute("lblArrivalMinute" + i)%></label></th>
           <th width = "100"><label name = "lblDeparture"><%=request.getAttribute("lblDepartureHour" + i)%>:<%=request.getAttribute("lblDepartureMinute" + i)%></label></th>
           <th width = "80">
             <button type = "submit" name  = "btnModify" value = "btnModify">修正</button>
@@ -88,6 +92,8 @@
       </tr>
       <%} %>
     </table>
+    </div>
+    </div>
     <BR>
     <form method = "POST" action = "personaltimecard">
       <button type = "submit" name = "btnBack" value = "btnBack001" style = "position : relative ; left : 230px ; width : 100px">戻る</button>

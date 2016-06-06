@@ -205,44 +205,53 @@
       <input type = "hidden" name = "hidDay" value = <%=day%>>
       <h2><%=year%>年<%=month%>月<%=day%>日出退勤修正履歴</h2>
     </form>
-    <div style = "height:200px; width:350px; overflow-y:scroll">
+    <div>
       <table border = "1">
         <tr>
-          <th>出勤時刻</th>
-          <th>登録日時</th>
+          <th width = "100">出勤時刻</th>
+          <th width = "200">登録日時</th>
         </tr>
-        <% Object size = request.getAttribute("arrivalSize");
-           int s = Integer.parseInt(size.toString());
-           for(int i = 0; i < s; i++){
-        %>
-        <tr>
-          <th width = "100"><label><%=request.getAttribute("lblArrival" + i)%></label></th>
-          <th width = "200"><label><%=request.getAttribute("lblArrivalRegistered" + i) %></label></th>
-        </tr>
-        <%
-           }
-        %>
-      </table><BR><BR>
-    </div><BR>
-    <div style = "height:200px; width:350px; overflow-y:scroll">
-      <table border = "1">
-        <tr>
-          <th>退勤時刻</th>
-          <th>登録日時</th>
-        </tr>
-        <% size = request.getAttribute("departureSize");
-           s = Integer.parseInt(size.toString());
-           for(int i = 0; i < s; i++)
-           {
-        %>
+      </table>
+      <div style = "height:160px; width:350px; overflow-y:scroll">
+        <table border = 1>
+          <% Object size = request.getAttribute("arrivalSize");
+             int s = Integer.parseInt(size.toString());
+             for(int i = 0; i < s; i++){
+          %>
           <tr>
-            <th width = "100"><label><%=request.getAttribute("lblDeparture" + i)%></label></th>
+            <th width = "100"><label><%=request.getAttribute("lblArrivalHistory" + i)%></label></th>
+            <th width = "200"><label><%=request.getAttribute("lblArrivalRegistered" + i) %></label></th>
+          </tr>
+          <%
+            }
+          %>
+        </table>
+      </div>
+    </div>
+    <BR>
+    <div>
+      <table border = "1">
+        <tr>
+          <th width = "100">退勤時刻</th>
+          <th width = "200">登録日時</th>
+        </tr>
+      </table>
+      <div style = "height:160px; width:350px; overflow-y:scroll">
+        <table border = "1">
+          <% size = request.getAttribute("departureSize");
+            s = Integer.parseInt(size.toString());
+            for(int i = 0; i < s; i++)
+            {
+          %>
+          <tr>
+            <th width = "100"><label><%=request.getAttribute("lblDepartureHistory" + i)%></label></th>
             <th width = "200"><label><%=request.getAttribute("lblDepartureRegistered" + i)%></label></th>
           </tr>
-        <%
+          <%
           }
-        %>
-      </table>
+          %>
+        </table>
+      </div>
     </div>
   </body>
 </html>

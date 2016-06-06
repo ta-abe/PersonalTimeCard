@@ -31,6 +31,13 @@ public class PersonalTimeCardServlet extends HttpServlet {
 			personaltimecard.registerDate(timecard);
 			String uuid = personaltimecard.getTodayUuid(year, month, day);
 			req.setAttribute("hidUuid", uuid);
+			if(null != req.getParameter("mode")){
+				int mode = Integer.parseInt(req.getParameter("mode").toString());
+				if(mode > 0)
+					req.setAttribute("mode", "登録が完了しました");
+				else
+					req.setAttribute("mode", "既に登録されています");
+			}
 			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 		}
 		catch (SQLException e)
@@ -95,7 +102,8 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				String dateUuid = personaltimecard.getTodayUuid(year, month, day);
 				TimeCard timecard = new TimeCard(dateUuid, hour, minute, null, null);
-				registerTime(timecard);
+				int num = registerTime(timecard);
+				req.setAttribute("num", num);
 				getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 			}
 			else if("btnDeparture".equals(req.getParameter("btnDeparture")))
@@ -106,10 +114,17 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				String day = String.valueOf(cal.get(Calendar.DATE));
 				String hour = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
 				String minute = String.valueOf(cal.get(Calendar.MINUTE));
+				if(Integer.parseInt(hour) < 10){
+					hour = "0" + hour;
+				}
+				if(Integer.parseInt(minute) < 10){
+					minute = "0" + minute;
+				}
 				PersonalTimeCard personaltimecard = new PersonalTimeCard();
 				String dateUuid = personaltimecard.getTodayUuid(year, month, day);
 				TimeCard timecard = new TimeCard(dateUuid, null, null, hour, minute);
-				registerTime(timecard);
+				int num =  registerTime(timecard);
+				req.setAttribute("num", num);
 				getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 			}
 			else if("btnBack001".equals(req.getParameter("btnBack")))
@@ -127,12 +142,12 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureRegisteredDatetime = timecard.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
 				for(int i = 0; i < arrivalSize; i++){
-					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalHistory" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize; i ++){
-					req.setAttribute("lblDeparture" + i, departureList.get(i));
+					req.setAttribute("lblDepartureHistory" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("year", req.getParameter("hidYear"));
@@ -158,12 +173,12 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
 				for(int i = 0; i < arrivalSize; i++){
-					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalHistory" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize; i ++){
-					req.setAttribute("lblDeparture" + i, departureList.get(i));
+					req.setAttribute("lblDepartureHistory" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("arrivalSize", arrivalSize);
@@ -189,12 +204,12 @@ public class PersonalTimeCardServlet extends HttpServlet {
 				List<String> departureRegisteredDatetime = timecard1.getDepartureRegisteredDatetime();
 				int arrivalSize = arrivalList.size();
 				for(int i = 0; i < arrivalSize; i++){
-					req.setAttribute("lblArrival" + i, arrivalList.get(i));
+					req.setAttribute("lblArrivalHistory" + i, arrivalList.get(i));
 					req.setAttribute("lblArrivalRegistered" + i, arrivalRegisteredDatetime.get(i));
 				}
 				int departureSize = departureList.size();
 				for(int i = 0 ; i < departureSize; i++){
-					req.setAttribute("lblDeparture" + i, departureList.get(i));
+					req.setAttribute("lblDepartureHistory" + i, departureList.get(i));
 					req.setAttribute("lblDepartureRegistered" + i, departureRegisteredDatetime.get(i));
 				}
 				req.setAttribute("arrivalSize", arrivalSize);
@@ -253,9 +268,10 @@ public class PersonalTimeCardServlet extends HttpServlet {
 	 * @param timecard 新規登録用のデータが格納されたオブジェクト
 	 * @throws SQLException
 	 */
-	private void registerTime(TimeCard timecard) throws SQLException{
+	private int registerTime(TimeCard timecard) throws SQLException{
 		PersonalTimeCard personaltimecard = new PersonalTimeCard();
-		personaltimecard.registerTime(timecard);
+		int num =  personaltimecard.registerTime(timecard);
+		return num;
 	}
 
 	/**

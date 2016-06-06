@@ -67,8 +67,10 @@ public class PersonalTimeCard {
 					departureHour = rs3.getString("DEPARTURE_HOUR");
 					departureMinute = rs3.getString("DEPARTURE_MINUTE");
 				}
-				TimeCard timecard = new TimeCard(dateUuid, day, arrivalHour, arrivalMinute, departureHour, departureMinute);
-				array.add(timecard);
+				if(arrivalHour != "--" || arrivalMinute != "--" || departureHour != "--" || departureMinute != "--"){
+					TimeCard timecard = new TimeCard(dateUuid, day, arrivalHour, arrivalMinute, departureHour, departureMinute);
+					array.add(timecard);
+				}
 			}
 		}
 		catch (ClassNotFoundException e)
@@ -185,7 +187,7 @@ public class PersonalTimeCard {
 	 * @param timecard 新規登録したいデータが格納されていいるオブジェクト
 	 * @throws SQLException
 	 */
-	public void registerTime(TimeCard timecard) throws SQLException{
+	public int registerTime(TimeCard timecard) throws SQLException{
 		String uuid = timecard.getUuid();
 		String dateUuid = timecard.getDateUuid();
 		String arrivalHour = timecard.getArrivalHour();
@@ -194,6 +196,7 @@ public class PersonalTimeCard {
 		String departureMinute = timecard.getDepartureMinute();
 		Connection conn = null;
 		PreparedStatement pst = null;
+		int num = 0;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
@@ -206,7 +209,7 @@ public class PersonalTimeCard {
 				pst.setString(3, arrivalHour);
 				pst.setString(4, arrivalMinute);
 				pst.setString(5, dateUuid);
-				pst.executeUpdate();
+				num =pst.executeUpdate();
 			}
 			else if(arrivalHour == null && arrivalMinute == null)
 			{
@@ -217,7 +220,7 @@ public class PersonalTimeCard {
 				pst.setString(3, departureHour);
 				pst.setString(4, departureMinute);
 				pst.setString(5, dateUuid);
-				pst.executeUpdate();
+				num = pst.executeUpdate();
 			}
 			conn.commit();
 		}
@@ -239,6 +242,7 @@ public class PersonalTimeCard {
 				conn.close();
 			}
 		}
+		return num;
 	}
 
 	/**

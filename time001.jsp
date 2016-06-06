@@ -5,8 +5,6 @@
   int year = now.get(now.YEAR);
   int month = now.get(now.MONTH);
   int day  = now.get(now.DATE);
-  int hour = now.get(now.HOUR_OF_DAY);
-  int minute = now.get(now.MINUTE);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -17,18 +15,46 @@
   <body>
     <%
       Object hiduuid = request.getAttribute("hidUuid");
-      if(null == hiduuid){
+      Object num = request.getAttribute("num");
+      if(null == hiduuid && null == num){
     %>
     <form method = "GET" action = "personaltimecard">
        <meta http-equiv = "refresh" content = "0;URL=http://localhost:8080/PersonalTimeCard/personaltimecard?year=<%=year%>&month=<%=month + 1%>&day=<%=day%>">
     </form>
+    <%}else if(null == hiduuid && null != num){%>
+    <form method = "GET" action = "personaltimecard">
+       <meta http-equiv = "refresh" content = "0;URL=http://localhost:8080/PersonalTimeCard/personaltimecard?year=<%=year%>&month=<%=month + 1%>&day=<%=day%>&mode=<%=num%>">
+    </form>
     <%}else{%>
     <h1>
-      <%=year%>年<%=month + 1%>月<%=day%>日<BR>
-      <%=hour%>時<%=minute%>分
+      <SCRIPT type="text/javascript"><!--
+        function myFunc(){
+          myDate=new Date();
+          myMsg = myDate.getFullYear() + "年";
+          myMsg += ( myDate.getMonth() + 1 ) + "月";
+          myMsg += myDate.getDate() + "日<BR>&emsp;&emsp;";
+          myMsg += ("0"+myDate.getHours()).slice(-2) + ":";
+          myMsg += ("0"+myDate.getMinutes()).slice(-2) + "";
+          document.getElementById("myIDdate").innerHTML = "&nbsp;" + myMsg;
+        }
+        // -->
+      </SCRIPT>
+      <DIV id="myIDdate">&nbsp;</DIV>
+            <SCRIPT type="text/javascript">
+      <!--
+        setInterval( "myFunc()", 1 );
+        //
+      -->
+      </SCRIPT>
     </h1>
+    <%
+      Object mode = request.getAttribute("mode");
+      if(null != mode){
+    %>
+    <h2>&nbsp;!<%=mode%></h2>
+    <%}%>
     <form method = "POST" action = "personaltimecard">
-      <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">
+      <input type = "hidden" name = "hidUuid" value = "<%=request.getAttribute("hidUuid")%>">&nbsp;&nbsp;
       <button type = "submit" name = "btnArrival" value = "btnArrival" style = "width : 81px; height : 50px"><h2>出勤</h2></button>
       <button type = "submit" name = "btnDeparture" value = "btnDeparture" style = "width : 81px; height : 50px"><h2>退勤</h2></button><BR><BR>
     </form>
