@@ -24,19 +24,35 @@ public class PersonalTimeCardServlet extends HttpServlet {
 		try {
 			req.setCharacterEncoding("UTF-8");
 			PersonalTimeCard personaltimecard = new PersonalTimeCard();
-			String year = req.getParameter("year");
-			String month = req.getParameter("month");
-			String day = req.getParameter("day");
-			TimeCard timecard = new TimeCard(year, month, day);
-			personaltimecard.registerDate(timecard);
-			String uuid = personaltimecard.getTodayUuid(year, month, day);
-			req.setAttribute("hidUuid", uuid);
-			if(null != req.getParameter("mode")){
-				int mode = Integer.parseInt(req.getParameter("mode").toString());
-				if(mode > 0)
-					req.setAttribute("mode", "登録が完了しました");
-				else
-					req.setAttribute("mode", "既に登録されています");
+			Object objYear = req.getParameter("year");
+			Object objMonth = req.getParameter("month");
+			Object objDay = req.getParameter("day");
+			String year = null;
+			String month = null;
+			String day = null;
+			if(objYear != null && objYear != "" && objMonth != null && objMonth != "" && objDay != null && objDay != ""){
+				year = objYear.toString();
+				month = objMonth.toString();
+				day = objDay.toString();
+				Calendar cal = Calendar.getInstance();
+				String a = String.valueOf(cal.get(Calendar.YEAR));
+				String b = String.valueOf((cal.get(Calendar.MONTH) + 1));
+				String c = String.valueOf(cal.get(Calendar.DATE));
+				if(year.equals(a) && month.equals(b) && day.equals(c)){
+					String mode = req.getParameter("mode");
+					TimeCard timecard = new TimeCard(year.toString(), month.toString(), day.toString());
+					personaltimecard.registerDate(timecard);
+					String uuid = personaltimecard.getTodayUuid(year.toString(), month.toString(), day.toString());
+					req.setAttribute("hidUuid", uuid);
+					if(null != req.getParameter("mode")){
+						if(mode.equals("1")){
+							req.setAttribute("mode", "登録が完了しました");
+						}
+						else if(mode.equals("0")){
+							req.setAttribute("mode", "既に登録されています");
+						}
+					}
+				}
 			}
 			getServletConfig().getServletContext().getRequestDispatcher("/time001.jsp").forward(req, resp);
 		}
